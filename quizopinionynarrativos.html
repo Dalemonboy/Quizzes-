@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz: Artículo de opinión y textos narrativos</title>
+<style>
+:root{--bg:#f1dfdb;--card:#fbf4f2;--ink:#1f4450;--soft:#5b7a84;--line:#c9b0ab;--ok:#2f7d4f;--okbg:#e3f3e8;--bad:#b23a48;--badbg:#f8e1e3;--op:#2f3a2a;--opbg:#dcf27f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.55;padding:20px 14px 40px}
+main{max-width:680px;margin:0 auto}
+h1{font-size:1.7rem;line-height:1.2;margin:0 0 6px}
+.sub{color:var(--soft);margin:0 0 22px}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:22px 20px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .3s}
+.meta{display:flex;justify-content:space-between;font-size:.9rem;color:var(--soft);margin-bottom:10px}
+.tag{padding:1px 10px;border-radius:99px;border:1.5px solid var(--ink);font-size:.85rem}
+.tag.op{background:var(--opbg);color:var(--op);border-color:var(--op)}
+.tag.nar{background:#e9c9c4}
+.tag.rep{background:#c9cfe8}
+h2{font-size:1.2rem;margin:4px 0 16px;line-height:1.35}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;color:inherit;text-align:left;background:#fff;border:2px solid var(--line);border-radius:8px;padding:11px 14px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.fb{margin-top:16px;padding:12px 14px;border-radius:8px;border-left:5px solid var(--ok);background:var(--okbg)}
+.fb.bad{border-color:var(--bad);background:var(--badbg)}
+.fb b{display:block;margin-bottom:2px}
+.btn{font:inherit;font-weight:bold;background:var(--ink);color:#fff;border:0;border-radius:8px;padding:10px 20px;cursor:pointer;margin-top:16px}
+.btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink);margin-left:8px}
+.score{font-size:2.6rem;font-weight:bold;margin:6px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0}
+td{padding:6px 4px;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-weight:bold}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Quiz: artículo de opinión y textos narrativos</h1>
+  <p class="sub">29 preguntas con retroalimentación inmediata.</p>
+
+  <section class="card" id="quiz">
+    <div class="bar"><i id="prog"></i></div>
+    <div class="meta"><span id="count"></span><span class="tag" id="tag"></span></div>
+    <h2 id="q"></h2>
+    <div class="opts" id="opts"></div>
+    <div id="fb" class="fb hidden" role="status"></div>
+    <button class="btn hidden" id="next"></button>
+  </section>
+
+  <section class="card hidden" id="end">
+    <h2>Resultado final</h2>
+    <div class="score" id="score"></div>
+    <p id="msg"></p>
+    <table id="tbl"></table>
+    <button class="btn" id="again">Repetir quiz</button>
+    <button class="btn alt hidden" id="review">Repasar las falladas</button>
+  </section>
+</main>
+
+<script>
+const T={op:"Artículo de opinión",nar:"Textos narrativos",rep:"Reportaje"};
+const ALL=[
+{t:"op",q:"¿Cuál es la función principal de un artículo de opinión?",o:["Informar hechos de manera neutral, sin postura del autor","Expresar un punto de vista personal sobre un tema, sustentado con razones o ejemplos","Narrar una historia con personajes y desenlace","Describir paso a paso un procedimiento"],c:1,e:"La opinión es la protagonista, pero debe apoyarse en razones o ejemplos para que el lector entienda la perspectiva del autor."},
+{t:"op",q:"¿Cuál de estas es una característica del artículo de opinión?",o:["Evita usar datos para no perder subjetividad","Se basa en evidencia y datos que respaldan la opinión","Se escribe siempre en verso","No necesita una postura definida"],c:1,e:"Aunque es una perspectiva personal, está argumentada y basada en evidencia y datos."},
+{t:"op",q:"¿Cuál es la estructura de un artículo de opinión?",o:["Desenlace, clímax, introducción","Título, introducción, desarrollo, conclusión","Introducción, nudo, desenlace","Título, conclusión, desarrollo, introducción"],c:1,e:"Se compone de título, introducción, desarrollo (argumentos y contraargumentos) y conclusión."},
+{t:"op",q:"¿Qué se presenta en la introducción de un artículo de opinión?",o:["La síntesis final de los argumentos","Las refutaciones a los argumentos contrarios","El tema, el contexto y la tesis principal que se defenderá","Únicamente el título"],c:2,e:"La introducción plantea el tema, da contexto y enuncia la tesis. La síntesis pertenece a la conclusión."},
+{t:"op",q:"¿Qué debe incluir el desarrollo?",o:["Solo la tesis repetida","Argumentos sólidos con evidencias y ejemplos, y la refutación de posibles argumentos en contra","Un final sorpresivo","Una lista de fuentes sin explicación"],c:1,e:"El desarrollo presenta argumentos y contraargumentos: reconoce las posturas opuestas y las refuta."},
+{t:"op",q:"El elemento clave que consiste en “presentar hechos y datos para apoyar la tesis y los argumentos” es:",o:["Claridad","Estilo","Evidencia","Conclusión"],c:2,e:"Los tres elementos clave son claridad (ideas concisas y comprensibles), evidencia (hechos y datos) y estilo (lenguaje claro y atractivo)."},
+{t:"op",q:"¿Qué busca el autor de un artículo de opinión con respecto al lector?",o:["Entretenerlo con una historia","Persuadirlo de su punto de vista","Enseñarle una receta","Que memorice datos aislados"],c:1,e:"El autor busca persuadir; por eso es breve, capta la atención rápido y transmite el mensaje de forma eficiente."},
+{t:"nar",q:"¿Cuál es la finalidad de un texto narrativo?",o:["Convencer mediante argumentos","Relatar hechos reales o ficticios que suceden en un tiempo y espacio determinados","Dar instrucciones","Definir conceptos técnicos"],c:1,e:"El texto narrativo relata hechos, reales o ficticios, ubicados en un tiempo y un espacio."},
+{t:"nar",q:"¿En qué tres elementos se basa un texto narrativo?",o:["Tesis, argumentos y conclusión","Narrador, personajes y secuencia de eventos","Título, resumen y bibliografía","Rima, métrica y estrofas"],c:1,e:"Un narrador, personajes y una secuencia de eventos conforman la historia."},
+{t:"nar",q:"Un narrador que cuenta la historia en primera persona es un narrador:",o:["Omnisciente","Testigo","Protagonista","Ausente"],c:2,e:"El protagonista habla en primera persona. El omnisciente narra en tercera persona y el testigo observa los hechos sin ser el centro."},
+{t:"nar",q:"¿Cómo se llama el salto temporal al pasado, también conocido como flashback?",o:["Prolepsis","Analepsis","Clímax","Desenlace"],c:1,e:"La analepsis vuelve al pasado (flashback)."},
+{t:"nar",q:"Una prolepsis en un relato es:",o:["Una anticipación de hechos futuros","Un recuerdo del pasado","El final de la historia","La descripción de un personaje"],c:0,e:"La prolepsis anticipa lo que ocurrirá; es el salto hacia adelante, contrario a la analepsis."},
+{t:"nar",q:"En la estructura narrativa, ¿qué es el clímax o nudo?",o:["El inicio donde se presentan los personajes","El núcleo de la acción y de la tensión dramática que precede al desenlace","La resolución final de la trama","La descripción del espacio"],c:1,e:"El orden es: introducción, desarrollo, clímax o nudo y desenlace. El clímax es el punto de mayor tensión."},
+{t:"nar",q:"¿En qué parte del relato se resuelve la trama?",o:["Introducción","Desarrollo","Clímax","Desenlace"],c:3,e:"El desenlace es el final, donde se resuelve la trama."},
+{t:"nar",q:"¿Cuál es la diferencia principal entre un texto narrativo literario y uno no literario?",o:["El literario tiene finalidad estética o artística; el no literario, informar o documentar de forma funcional","El literario siempre es más corto","El no literario no tiene secuencia de hechos","No existe ninguna diferencia"],c:0,e:"La clasificación depende de la intención comunicativa: estética en los literarios, funcional en los no literarios."},
+{t:"nar",q:"¿Cuál de los siguientes es un ejemplo de texto narrativo NO literario?",o:["Fábula","Novela","Crónica periodística","Leyenda"],c:2,e:"Las crónicas, biografías, anécdotas y reportajes son no literarios. Cuentos, novelas, mitos, leyendas y fábulas son literarios."},
+{t:"nar",q:"¿Qué recursos caracterizan el lenguaje de los textos narrativos literarios?",o:["Lenguaje informativo y directo","Metáforas, comparaciones y adjetivación rica","Solo datos estadísticos","Tecnicismos sin adornos"],c:1,e:"Los literarios usan lenguaje literario con recursos estilísticos. En las narrativas no literarias el lenguaje es más informativo y directo."},
+{t:"rep",q:"¿Qué es un reportaje?",o:["Un texto breve que solo da la noticia del día","Un género periodístico que desarrolla extensamente un tema real de interés general","Una narración de ficción con personajes inventados","Un escrito que solo expresa la opinión del periodista"],c:1,e:"El reportaje desarrolla extensamente un tema de interés general; puede tratar sobre personas, acontecimientos o lugares, siempre con una temática real que preocupe a los ciudadanos."},
+{t:"rep",q:"¿El reportaje debe estar ligado a la actualidad más inmediata?",o:["Sí, la inmediatez es lo más importante","No, porque los temas tratados ya son conocidos por el público","Sí, de lo contrario deja de ser periodístico","Solo si es un reportaje científico"],c:1,e:"A diferencia de la noticia, la inmediatez no es importante en el reportaje: sus temas ya son conocidos por el público."},
+{t:"rep",q:"¿Cómo se logra que un reportaje tenga información completa y fiel?",o:["Con una investigación exhaustiva de datos y testimonios de otras personas","Con la opinión personal del reportero únicamente","Copiando otras noticias","Evitando exponer distintos puntos de vista"],c:0,e:"Al exponer diferentes puntos de vista, el objetivo es que el lector saque sus propias conclusiones."},
+{t:"rep",q:"El reportaje que profundiza en hechos trascendentes e incluye declaraciones de personas y descripción de ambientes desde una perspectiva descriptiva y objetiva es el:",o:["Autobiográfico","Científico","Narrativo","Explicativo"],c:3,e:"El reportaje explicativo desarrolla un hecho noticioso con declaraciones, ambientes y una perspectiva descriptiva y objetiva."},
+{t:"rep",q:"En el reportaje descriptivo, la función primordial del reportero es:",o:["Retratar la situación como si fuera una pintura, con detalle minucioso","Investigar datos que nadie conoce","Contar su propia vida","Destacar avances científicos"],c:0,e:"El reportaje descriptivo describe los hechos de manera minuciosa y detallada, enriqueciendo la situación que presenta."},
+{t:"rep",q:"¿Qué tipo de reportaje requiere una labor casi detectivesca para captar detalles completamente desconocidos sobre un hecho?",o:["De investigación","De interés humano","Narrativo","Descriptivo"],c:0,e:"El reportaje de investigación busca detalles desconocidos sobre un hecho en particular."},
+{t:"rep",q:"El reportaje de interés humano se centra en:",o:["Los descubrimientos de la ciencia más reciente","Una persona o una colectividad, dando relevancia a su vida o a un aspecto de ella","El propio reportero","Una sucesión de hechos como en una crónica"],c:1,e:"El reportaje de interés humano da relevancia a la vida de una persona o colectividad, o a un aspecto de ella."},
+{t:"rep",q:"¿En qué tipo de reportaje el reportero es el personaje principal y trata sobre su propia vida?",o:["Científico","Explicativo","Autobiográfico","De investigación"],c:2,e:"El reportaje autobiográfico trata sobre la vida del propio reportero. El científico, en cambio, destaca los avances y descubrimientos de la ciencia más reciente, y el narrativo describe el suceso como una historia, muy similar a la crónica."},
+{t:"rep",q:"¿Qué tipo de reportaje es muy similar a la crónica y describe el suceso como si fuera una historia?",o:["Descriptivo","Narrativo","Científico","De interés humano"],c:1,e:"El reportaje narrativo cuenta el suceso como una historia, de forma muy parecida a la crónica."},
+{t:"rep",q:"¿Cuál es la parte más extensa y principal del reportaje, donde se muestra a profundidad el tema?",o:["Titular","Planteamiento","Nudo","Apoyos"],c:2,e:"El nudo es el desarrollo del reportaje. Las partes son: titular, planteamiento, nudo, conclusión y apoyos."},
+{t:"rep",q:"¿Qué son los “apoyos” en un reportaje?",o:["Los argumentos a favor de la tesis","Materiales o recursos que acompañan al texto, como fotos, entrevistas, encuestas o comentarios","La parte final donde se resuelve la trama","El título atractivo del reportaje"],c:1,e:"Los apoyos son recursos visuales, entrevistas, fotos, ediciones, encuestas, comentarios, etc., que acompañan al texto."},
+{t:"rep",q:"¿Qué puede mostrar la conclusión de un reportaje?",o:["Solo datos estadísticos","El punto de vista del periodista o dejar la interpretación al público","Siempre una tesis que persuada al lector","Únicamente el planteamiento repetido"],c:1,e:"El reportaje permite al periodista reflexionar y emitir juicios, así que la conclusión puede mostrar su punto de vista o dejarse a interpretación del público."}
+];
+
+let Q=[],i=0,hits=0,missed=[],stat={};
+const $=id=>document.getElementById(id);
+
+function start(list){
+  Q=list.slice();i=0;hits=0;missed=[];stat={op:[0,0],nar:[0,0],rep:[0,0]};
+  $("end").classList.add("hidden");$("quiz").classList.remove("hidden");show();
+}
+function show(){
+  const x=Q[i];
+  $("prog").style.width=(i/Q.length*100)+"%";
+  $("count").textContent="Pregunta "+(i+1)+" de "+Q.length;
+  $("tag").textContent=T[x.t];$("tag").className="tag "+x.t;
+  $("q").textContent=x.q;
+  $("fb").classList.add("hidden");$("next").classList.add("hidden");
+  const box=$("opts");box.innerHTML="";
+  x.o.forEach((txt,k)=>{
+    const b=document.createElement("button");
+    b.className="opt";b.textContent=txt;b.onclick=()=>answer(k);box.appendChild(b);
+  });
+}
+function answer(k){
+  const x=Q[i],good=k===x.c,btns=[...$("opts").children];
+  btns.forEach((b,n)=>{b.disabled=true;if(n===x.c)b.classList.add("ok");else if(n===k)b.classList.add("bad")});
+  stat[x.t][1]++;
+  if(good){hits++;stat[x.t][0]++}else missed.push(x);
+  const fb=$("fb");fb.className="fb"+(good?"":" bad");
+  fb.innerHTML="<b>"+(good?"¡Correcto!":"No exactamente.")+"</b>"+(good?"":"La respuesta correcta es: “"+x.o[x.c]+"”. ")+x.e;
+  $("next").textContent=i===Q.length-1?"Ver resultado":"Siguiente pregunta";
+  $("next").classList.remove("hidden");$("next").focus();
+}
+$("next").onclick=()=>{i++;i<Q.length?show():finish()};
+function finish(){
+  $("quiz").classList.add("hidden");$("end").classList.remove("hidden");
+  const n=Q.length,p=Math.round(hits/n*100);
+  $("score").textContent=hits+" / "+n+" ("+p+"%)";
+  $("msg").textContent=p>=90?"Excelente, dominas estos temas.":p>=70?"Muy bien, solo repasa los detalles que fallaste.":p>=50?"Vas por buen camino; vuelve a revisar las presentaciones y repite el quiz.":"Conviene repasar las presentaciones con calma y volver a intentarlo.";
+  $("tbl").innerHTML=Object.keys(T).filter(t=>stat[t][1]).map(t=>"<tr><td>"+T[t]+"</td><td>"+stat[t][0]+" / "+stat[t][1]+"</td></tr>").join("");
+  $("review").classList.toggle("hidden",!missed.length);
+  $("prog").style.width="100%";
+}
+$("again").onclick=()=>start(ALL);
+$("review").onclick=()=>start(missed);
+start(ALL);
+</script>
+</body>
+</html>
