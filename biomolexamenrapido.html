@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz Biomol – Examen rápido</title>
+<style>
+:root{--bg:#f6f7fb;--c:#fff;--t:#1d2433;--m:#5b6477;--p:#2f6df6;--ok:#1a9d5a;--no:#d64545;--b:#d9dde8}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--c:#1b202b;--t:#e8ebf2;--m:#98a1b5;--p:#6c97ff;--ok:#3ccf86;--no:#ff7a7a;--b:#333b4d}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.5 system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:.2em 0}.card{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:18px;margin:14px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--b);background:var(--c);color:var(--t);border-radius:20px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.9rem}
+.chip.on{background:var(--p);border-color:var(--p);color:#fff}
+button.main{background:var(--p);color:#fff;border:0;border-radius:10px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer;margin:4px 6px 4px 0}
+button.sec{background:transparent;color:var(--p);border:1px solid var(--p)}
+.bar{height:8px;background:var(--b);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--p);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--m);font-size:.88rem;margin:6px 0}
+.tag{display:inline-block;font-size:.75rem;background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:1px 8px;color:var(--m)}
+.q{font-size:1.1rem;font-weight:600;margin:10px 0 14px}
+.opt{display:block;width:100%;text-align:left;background:var(--c);color:var(--t);border:1.5px solid var(--b);border-radius:10px;padding:11px 13px;margin:8px 0;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--p)}.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.opt.no{border-color:var(--no);background:color-mix(in srgb,var(--no) 14%,transparent)}
+.fb{margin-top:12px;padding:12px;border-radius:10px;border-left:4px solid var(--p);background:var(--bg)}
+.row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--b);font-size:.95rem}
+.hide{display:none}
+</style></head><body><main>
+<h1>🧬 Quiz Biomol – Examen rápido</h1>
+<div id="app"></div></main>
+<script>
+// [tema, pregunta, CORRECTA, inc1, inc2, inc3, retroalimentación]
+const D=[
+["qPCR","En qPCR, un Ct BAJO indica…","Mayor cantidad inicial de material genético","Menor cantidad inicial de material genético","Que no hubo amplificación","Contaminación de la muestra","Ct/Cq = ciclos necesarios para que la fluorescencia supere el umbral. Menos ciclos = había más molde al inicio."],
+["qPCR","Un Ct ALTO (cercano al límite de detección) significa…","Poco material inicial; se interpreta con precaución","Mucho material inicial","Resultado negativo seguro","Eficiencia perfecta","Ct alto = menor cantidad inicial. Cerca del límite de detección el resultado es menos confiable."],
+["qPCR","¿Existe un Ct universal para definir positivo o negativo?","No; el punto de corte se valida para cada prueba","Sí, Ct = 30","Sí, Ct = 40","Sí, Ct = 35 para todo virus","No hay Ct universal; cada ensayo debe validar su propio punto de corte."],
+["qPCR","Si el control negativo/NTC muestra amplificación, lo más probable es…","Contaminación","Que la muestra es positiva","Que la eficiencia es 100 %","Que el Ct es bajo","El NTC no debe amplificar; si lo hace, hay contaminación y el resultado no es confiable."],
+["qPCR","Eficiencia ideal de una qPCR:","90–110 %","50–70 %","120–150 %","Menor a 80 %","La eficiencia ideal ronda 90–110 %."],
+["qPCR","En SYBR Green, la especificidad del producto se verifica con…","Curva de disociación (melting curve)","Gel de agarosa solamente","Control positivo","Ct","La curva de disociación revela si hay un solo producto o también dímeros/inespecíficos."],
+["qPCR","RT-qPCR requiere, además de los reactivos de qPCR…","Transcriptasa inversa","Ligasa","Enzima de restricción","Helicasa","La transcriptasa inversa convierte el ARN en ADNc antes de amplificar. Se usa en expresión génica y carga viral de virus ARN."],
+["qPCR","¿Cómo detecta la qPCR la amplificación en cada ciclo?","Colorantes fluorescentes o sondas marcadas","Electroforesis al final","Secuenciación Sanger","Western blot","Mide fluorescencia ciclo a ciclo; por eso no necesita gel."],
+["qPCR","Lo que debe interpretarse en conjunto con el Ct es…","Controles + eficiencia + especificidad + límite de detección","Solo el control positivo","Solo la curva de disociación","Solo la intensidad de banda","El Ct solo no basta: se revisan controles, curva, eficiencia, especificidad y límite de detección."],
+["PCR punto final","El resultado de la PCR de punto final es principalmente…","Cualitativo (presencia o ausencia)","Cuantitativo exacto","Una curva de fluorescencia","Un valor de Ct","Se lee al final con electroforesis: dice si el fragmento está o no, sin cuantificar bien."],
+["PCR punto final","Temperatura típica de la desnaturalización:","94–95 °C","50–65 °C","72 °C","37 °C","Separa las dos cadenas de ADN."],
+["PCR punto final","¿Qué ocurre en el alineamiento (50–65 °C)?","Los cebadores se unen al ADN molde","La Taq sintetiza ADN","Se separan las cadenas","Se degrada el ADN","Los primers hibridan con su secuencia complementaria."],
+["PCR punto final","La Taq polimerasa sintetiza nuevas cadenas a…","72 °C","94 °C","55 °C","4 °C","Es la etapa de extensión."],
+["PCR punto final","Número típico de ciclos en PCR de punto final:","25–35","3–5","100–150","1","Se hacen 25–35 ciclos, con desnaturalización inicial y extensión final."],
+["PCR punto final","¿Cuál es el cofactor de la polimerasa en la mezcla de PCR?","MgCl₂","NaCl","KOH","CaCl₂","El MgCl₂ es cofactor de la Taq; el buffer mantiene las condiciones."],
+["PCR punto final","El control negativo (NTC) contiene…","Todos los reactivos excepto el ADN molde","Solo ADN","Solo agua y gel","ADN con la secuencia diana","Si aparece banda en el NTC, hubo contaminación."],
+["PCR punto final","El marcador de peso molecular (ladder) sirve para…","Estimar el tamaño en pb de los fragmentos","Amplificar el ADN","Servir de control negativo","Teñir el gel","Se compara la altura de la banda de la muestra con el ladder."],
+["PCR punto final","En el gel, el ADN migra hacia…","El polo positivo (ánodo), por su carga negativa","El polo negativo","No migra","El centro del gel","El ADN tiene carga negativa por sus fosfatos."],
+["PCR punto final","Bandas pequeñas y difusas cerca del frente del gel suelen ser…","Dímeros de cebadores","Un resultado positivo","ADN genómico","Amplificación específica","Los primers se hibridan entre sí; no indican positivo."],
+["PCR punto final","Muchas bandas de distintos tamaños indican…","Amplificación inespecífica (alineamiento bajo o exceso de ciclos)","Control positivo correcto","Gel muy corto","Ladder dañado","Los cebadores se unieron a zonas no deseadas."],
+["PCR punto final","Un barrido continuo en el carril (smear) suele deberse a…","ADN degradado, exceso de plantilla o nucleasas","Primers perfectos","Alta especificidad","Control positivo","Revisa calidad y cantidad del ADN molde."],
+["PCR punto final","Carril de muestra limpio, control positivo con banda y control negativo limpio →","Muestra NEGATIVA","Muestra positiva","Ensayo inválido","Contaminación","Los controles funcionaron; simplemente no hay ese ADN en la muestra."],
+["ADN recombinante","El ADN recombinante (o quimérico) es…","ADN formado al combinar secuencias de distintas procedencias","ADN sin mutaciones","ARN transcrito","ADN mitocondrial","Se aísla el gen, se une a un vector y se introduce en una célula huésped."],
+["ADN recombinante","Pasos de la recombinación genética, en orden:","Obtener gen → cortar ADN → preparar vector → unir → introducir en huésped → seleccionar → multiplicar/expresar","Introducir → cortar → seleccionar → unir","Seleccionar → cortar → obtener gen","Preparar vector → expresar → cortar","Ese es el orden de los 7 pasos de la presentación."],
+["ADN recombinante","¿Qué componente del vector permite copiar el plásmido en la célula huésped?","Origen de replicación (ORI)","Promotor","Poli A","Marcador de selección","El ORI permite la replicación del plásmido."],
+["ADN recombinante","El marcador de selección (p. ej. AmpR) sirve para…","Identificar las células que incorporaron el plásmido","Iniciar la transcripción","Estabilizar el ARNm","Cortar el ADN","Suele ser resistencia a antibiótico: solo crecen las células transformadas."],
+["ADN recombinante","El sitio múltiple de clonación (SCM) contiene…","Sitios de restricción para insertar el gen de interés","El promotor T7","La cola poli A","El gen de resistencia","Ej.: HindIII, XhoI, BamHI, XbaI, EcoRI."],
+["ADN recombinante","En E. coli (pET/pGEX) la transcripción se induce con…","IPTG","Glucosa","Ampicilina","Isoniazida","Promotor T7 regulado por el operón lactosa; el IPTG libera el promotor."],
+["ADN recombinante","¿Cuál NO es limitación de E. coli como sistema de expresión?","Glicosilación humana perfecta","Cuerpos de inclusión","Ausencia de puentes disulfuro","Sesgo de codones","Los problemas son cuerpos de inclusión, ambiente reductor (sin puentes disulfuro) y sesgo de codones."],
+["ADN recombinante","Las células CHO son el estándar biofarmacéutico porque…","Más del 80 % de los anticuerpos terapéuticos aprobados provienen de ellas","Crecen más rápido que E. coli","No tienen genoma","Solo producen insulina","CHO = ovario de hámster chino."],
+["ADN recombinante","Expresión estable vs. transitoria:","Estable: el gen se integra al genoma; transitoria: no se integra","Estable: no se integra; transitoria: sí","Ambas se integran","Ninguna usa vector","En la estable el gen queda permanente en el genoma cromosómico."],
+["ADN recombinante","Los sistemas de selección DHFR y GS se usan en…","Células CHO para conservar las que integraron el gen","E. coli para inducir con IPTG","Microarreglos","PCR","DHFR: células sin dihidrofolato reductasa. GS: crecen sin glutamina solo las que integraron el gen GS."],
+["ADN recombinante","La rhGH sustituyó a la hGH de hipófisis de cadáver porque esta transmitía…","Enfermedad de Creutzfeldt-Jakob","VIH","Hepatitis B","Tuberculosis","rhGH: 191 aa, induce IGF-1 en hígado."],
+["ADN recombinante","El factor VIII recombinante (rFVIII) se produce habitualmente en…","Células CHO","E. coli","Levaduras","Plantas","Es cofactor para activar el Factor X y eliminó el riesgo de VIH y hepatitis del plasma."],
+["ADN recombinante","Antes de 1982 la insulina se obtenía de…","Páncreas de cerdo o vaca","Bacterias","Plantas","Hámster","La versión recombinante eliminó reacciones alérgicas e inmunológicas graves."],
+["ADN recombinante","El rtPA (alteplasa) actúa…","Convirtiendo plasminógeno en plasmina que degrada fibrina","Inhibiendo el Factor X","Aumentando eritrocitos","Bajando glucosa","Trombolisis dirigida al coágulo; superó a la estreptoquinasa, que causaba hemorragias sistémicas."],
+["ADN recombinante","El Arroz Dorado produce…","β-caroteno (provitamina A)","Insulina","Hormona de crecimiento","Vitamina C","Biofortificación contra la deficiencia de vitamina A."],
+["Microarreglos","El principio de un microarreglo es…","Hibridación y complementariedad","Amplificación con Taq","Electroforesis","Secuenciación Sanger","Sondas fijas en soporte (vidrio/sílice/plástico) hibridan con muestra marcada."],
+["Microarreglos","En microarreglos de cDNA (spotted) se usan los fluoróforos…","Cy3 y Cy5","SYBR y EvaGreen","GFP y RFP","FAM y ROX","Se calcula el ratio Cy5/Cy3."],
+["Microarreglos","Affymetrix GeneChip (oligonucleótidos in situ) usa señal…","PM − MM (perfect match / mismatch)","Cy5/Cy3","Ct","Curva de disociación","El mismatch ayuda a restar hibridación inespecífica."],
+["Microarreglos","Los microarreglos cromosómicos (CMA) detectan…","CNV: microdeleciones y duplicaciones","Solo mutaciones puntuales","Proteínas","Carga viral","CMA/CGH/SNP detectan variaciones en número de copias."],
+["Microarreglos","Orden del protocolo de microarreglo de ARN:","Aislar ARN → RT y marcaje → hibridación → lavados de rigurosidad → escaneo y análisis","Hibridación → aislar ARN → escaneo","Lavados → RT → aislar","Escaneo → hibridación → marcaje","Los lavados eliminan fragmentos no hibridados y uniones inespecíficas."],
+["Microarreglos","Tras escanear, la normalización (p. ej. por cuantiles) sirve para…","Eliminar la variabilidad técnica entre chips","Amplificar la señal","Marcar las muestras","Cortar el ADN","Se ajustan los datos para comparar chips entre sí."],
+["Microarreglos","Un VUS en CMA es…","Variante sin evidencia suficiente para clasificarla","Variante patogénica confirmada","Variante benigna común","Un artefacto del escáner","Clasificación ISCA/ACMG: patogénico/probablemente patogénico, benigno o VUS."],
+["Microarreglos","Ventaja principal de los microarreglos:","Análisis masivo en paralelo (miles a millones de regiones)","Cuantifican con un solo gen","No requieren equipo","Son iguales a un gel","También ahorran reactivos (nL–pL) y tienen alta resolución citogenética."],
+["Dx adquiridas","¿Qué técnica se usa para carga viral de VIH-1?","RT-qPCR en plasma (copias/mL)","Xpert MTB/RIF","FISH","Southern blot","Detecta y cuantifica ARN viral con transcripción inversa + PCR en tiempo real."],
+["Dx adquiridas","El VIH infecta principalmente…","Linfocitos T CD4+","Hepatocitos","Macrófagos pulmonares únicamente","Eritrocitos","Baja la respuesta inmune; sin tratamiento evoluciona a SIDA. Tx: TAR."],
+["Dx adquiridas","Xpert MTB/RIF Ultra detecta resistencia a rifampicina mediante el gen…","rpoB","CFTR","HBB","FGFR3","Muestra: esputo; resultado en menos de 2 horas."],
+["Dx adquiridas","Desventaja del Xpert MTB/RIF Ultra:","Un negativo no descarta todos los casos ni sustituye al cultivo","Tarda días","Solo sirve en sangre","No detecta resistencia","Requiere equipo específico y no sustituye pruebas completas de susceptibilidad."],
+["Dx adquiridas","Tratamiento de primera línea de tuberculosis:","Isoniazida, rifampicina, pirazinamida, etambutol","Tenofovir y entecavir","TAR","Hidroxiurea","Tenofovir/entecavir son para hepatitis B."],
+["Dx adquiridas","La qPCR para hepatitis B cuantifica ADN viral, generalmente en…","UI/mL","copias/mL","Ct universales","pb","Sirve para evaluar replicación y respuesta al tratamiento; complementa serología."],
+["Dx adquiridas","FISH utiliza…","Sondas fluorescentes para localizar secuencias de ADN","Taq polimerasa","Anticuerpos","Transcriptasa inversa","Permite localizar secuencias específicas en células o tejidos."],
+["Dx congénitas","Fibrosis quística: gen y herencia","CFTR, autosómica recesiva","HBB, autosómica recesiva","CFTR, ligada al X","FGFR3, autosómica dominante","Moco espeso en pulmón y digestión. Dx: secuenciación Sanger de CFTR."],
+["Dx congénitas","Síndrome de Down: alteración y técnica rápida de dx","Trisomía 21; QF-PCR","Monosomía X; Southern blot","Mutación en HBB; ELISA","Deleción CFTR; FISH","QF-PCR detecta alteraciones en el número de cromosomas."],
+["Dx congénitas","Anemia falciforme: gen y técnica","HBB; PCR específica de alelo","CFTR; QF-PCR","HBB; QF-PCR","rpoB; Xpert","Detecta la variante de HBB que produce hemoglobina S. Tx: hidroxiurea, transfusiones."],
+["Dx congénitas","Una enfermedad congénita es la que…","Se origina en el desarrollo intrauterino y está presente al nacer","Aparece solo por hábitos","Se adquiere por infección en adultos","Siempre es hereditaria","Pueden ser genéticas, cromosómicas, infecciosas, ambientales, teratógenos o multifactoriales."],
+["Dx congénitas","¿Cuál es una enfermedad ADQUIRIDA?","Diabetes mellitus tipo 2","Espina bífida","Tetralogía de Fallot","Labio/paladar hendido","También: hipertensión, tuberculosis, infarto, osteoartritis."],
+["Dx congénitas","La secuenciación de Sanger sirve para…","Determinar el orden exacto de los nucleótidos","Cuantificar proteínas","Contar cromosomas","Medir fluorescencia por ciclo","Permite identificar mutaciones o variantes en regiones específicas."],
+["Comparativo","¿Qué técnica NO necesita gel y mide fluorescencia por ciclo?","qPCR","PCR de punto final","Southern blot","Sanger clásico","qPCR integra detección y análisis durante la reacción."],
+["Comparativo","Necesitas saber CUÁNTO ADN viral hay. ¿Cuál eliges?","PCR en tiempo real","PCR de punto final","FISH","Gel de agarosa","qPCR cuantifica; punto final solo dice presente/ausente."],
+["Comparativo","Quieres analizar miles de genes a la vez. ¿Cuál eliges?","Microarreglo","PCR de punto final","Sanger","ELISA","Los microarreglos hacen análisis masivo en paralelo."],
+["Comparativo","Empareja gen–enfermedad/uso correcto:","rpoB – resistencia a rifampicina en TB","CFTR – anemia falciforme","HBB – fibrosis quística","rpoB – hepatitis B","CFTR = fibrosis quística; HBB = falciforme; rpoB = resistencia a rifampicina."],
+["Comparativo","Producir insulina humana en bacterias es ejemplo de…","ADN recombinante","PCR","Microarreglo","FISH","Gen humano → plásmido → E. coli → insulina."],
+["Comparativo","Control que contiene todos los reactivos sin ADN molde en PCR/qPCR:","NTC (control negativo)","Control positivo","Ladder","Calibrador","Detecta contaminación en ambas técnicas."]
+];
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const topics=[...new Set(D.map(d=>d[0]))];
+let sel=new Set(topics),L=[],i=0,res=[],done=false;
+const app=document.getElementById("app");
+function home(){
+ app.innerHTML=`<div class="card"><b>${D.length} preguntas</b> sobre qPCR, PCR punto final, ADN recombinante, microarreglos y diagnóstico molecular. Elige temas:
+ <div class="chips">${topics.map(t=>`<button class="chip ${sel.has(t)?"on":""}" data-t="${t}">${t} (${D.filter(d=>d[0]==t).length})</button>`).join("")}</div>
+ <button class="sec main" id="all">Todos</button><button class="sec main" id="none">Ninguno</button>
+ <p class="meta" id="cnt"></p><button class="main" id="go">Empezar</button></div>`;
+ const upd=()=>{document.getElementById("cnt").textContent=D.filter(d=>sel.has(d[0])).length+" preguntas seleccionadas";document.getElementById("go").disabled=!sel.size};
+ app.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const t=b.dataset.t;sel.has(t)?sel.delete(t):sel.add(t);b.classList.toggle("on");upd()});
+ all.onclick=()=>{sel=new Set(topics);home()};none.onclick=()=>{sel=new Set();home()};
+ go.onclick=()=>start(D.filter(d=>sel.has(d[0])));upd();
+}
+function start(list){L=sh(list);i=0;res=[];show()}
+function show(){
+ if(i>=L.length)return end();
+ const d=L[i],opts=sh([d[2],d[3],d[4],d[5]]),ok=res.filter(r=>r.ok).length;
+ app.innerHTML=`<div class="bar"><i style="width:${i/L.length*100}%"></i></div>
+ <div class="meta"><span>Pregunta ${i+1} de ${L.length}</span><span>✔ ${ok} · ✘ ${res.length-ok}</span></div>
+ <div class="card"><span class="tag">${d[0]}</span><div class="q">${d[1]}</div><div id="o">${opts.map(o=>`<button class="opt">${o}</button>`).join("")}</div><div id="f"></div></div>`;
+ document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+  const good=b.textContent==d[2];res.push({t:d[0],ok:good,d});
+  document.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.textContent==d[2])x.classList.add("ok");else if(x===b)x.classList.add("no")});
+  f.innerHTML=`<div class="fb"><b>${good?"✅ ¡Correcto!":"❌ Incorrecto"}</b><br>${good?"":"Respuesta: <b>"+d[2]+"</b><br>"}${d[6]}</div><button class="main" id="nx">${i+1<L.length?"Siguiente →":"Ver resultados"}</button>`;
+  nx.onclick=()=>{i++;show()};
+ });
+}
+function end(){
+ const ok=res.filter(r=>r.ok).length,pct=Math.round(ok/res.length*100),bad=res.filter(r=>!r.ok);
+ const by={};res.forEach(r=>{by[r.t]=by[r.t]||[0,0];by[r.t][1]++;if(r.ok)by[r.t][0]++});
+ app.innerHTML=`<div class="card"><h2>${pct>=80?"🎉":pct>=60?"👍":"📚"} ${ok} / ${res.length} (${pct} %)</h2>
+ <b>Por tema</b>${Object.entries(by).map(([t,v])=>`<div class="row"><span>${t}</span><span>${v[0]}/${v[1]} (${Math.round(v[0]/v[1]*100)} %)</span></div>`).join("")}
+ <p>${bad.length?"Falladas: "+bad.length:"¡Sin errores!"}</p>
+ ${bad.length?`<button class="main" id="rv">Repasar falladas</button>`:""}<button class="main sec" id="rs">Elegir temas</button><button class="main sec" id="rt">Repetir todo</button></div>
+ ${bad.map(r=>`<div class="card"><span class="tag">${r.t}</span><div class="q">${r.d[1]}</div><div>✅ <b>${r.d[2]}</b></div><div class="fb">${r.d[6]}</div></div>`).join("")}`;
+ if(bad.length)rv.onclick=()=>start(bad.map(r=>r.d));
+ rs.onclick=home;rt.onclick=()=>start(L);window.scrollTo(0,0);
+}
+home();
+</script></body></html>
