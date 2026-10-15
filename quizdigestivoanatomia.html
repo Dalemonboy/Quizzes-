@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz de Anatomía II: sistema digestivo</title>
+<style>
+:root{--bg:#f6f4f0;--card:#fff;--ink:#1f2a2e;--mute:#5c6b70;--line:#d9d4cb;--accent:#1f6f6b;--ok:#2e7d4f;--okbg:#e4f3ea;--bad:#b3392f;--badbg:#f9e5e2}
+@media (prefers-color-scheme:dark){:root{--bg:#161b1d;--card:#20282b;--ink:#eef1f0;--mute:#9fb0b4;--line:#34413f;--accent:#6cc4bd;--ok:#7fd3a0;--okbg:#1d3a2b;--bad:#f09a90;--badbg:#3f2522}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.55;padding:24px 16px}
+main{max-width:640px;margin:0 auto}
+h1{font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 24px;font-family:system-ui,sans-serif;font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px}
+.prog{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--mute);margin-bottom:10px}
+.q{font-size:1.15rem;margin:0 0 16px}
+.opt{display:block;width:100%;text-align:left;font:inherit;background:transparent;color:inherit;border:1px solid var(--line);border-radius:8px;padding:11px 14px;margin-bottom:8px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:16px;padding:14px 16px;border-left:4px solid var(--accent);background:var(--bg);border-radius:0 8px 8px 0;font-size:.97rem}
+.fb strong.ok{color:var(--ok)}.fb strong.bad{color:var(--bad)}
+.fb ul{margin:8px 0 0;padding-left:20px}.fb ul:empty{display:none}
+.btn{margin-top:16px;font:600 .95rem system-ui,sans-serif;background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:11px 20px;cursor:pointer}
+.score{font-size:2.4rem;margin:6px 0}
+[hidden]{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>Sistema digestivo: Anatomía II</h1>
+  <p class="sub">Preguntas de parciales y ordinarios de Anatomía II</p>
+  <div class="card" id="app"></div>
+</main>
+<script>
+const preguntas = [
+{
+"q": "En esta parte del tronco encefálico se encuentra el centro cardiovascular, el reflejo del vómito, deglución, estornudos, tos e hipo:",
+"o": [
+"cerebelo",
+"mesencéfalo",
+"protuberancia",
+"bulbo raquídeo"
+],
+"c": 3,
+"fb": "El bulbo raquídeo es el centro de los reflejos vitales: aquí están el centro cardiovascular y respiratorio y los centros de los reflejos de vómito y deglución (parte del control del tubo digestivo alto), además de estornudo, tos e hipo.",
+"por": [
+"Cerebelo: no es parte del tronco encefálico; suaviza y coordina la contracción de los músculos esqueléticos.",
+"Mesencéfalo: contiene los núcleos de los nervios III y IV y los reflejos visuales y auditivos.",
+"Protuberancia: contiene los núcleos de los nervios V, VI, VII y VIII y participa en la regulación del ritmo respiratorio."
+]
+},
+{
+"q": "Este nervio controla la presión arterial, excreción de órganos gastrointestinales y constricción de vías respiratorias; transmite el gusto desde la epiglotis.",
+"o": [
+"X",
+"XI",
+"XII",
+"IX"
+],
+"c": 0,
+"fb": "El nervio vago (X) lleva fibras parasimpáticas a las vísceras del tórax y del abdomen: estimula la motilidad y las secreciones del tubo digestivo (hasta aproximadamente los dos tercios proximales del colon transverso). También regula la frecuencia cardiaca y la presión arterial, constriñe las vías respiratorias y transmite el gusto de la epiglotis.",
+"por": [
+"XI (accesorio): inerva los músculos trapecio y esternocleidomastoideo.",
+"XII (hipogloso): es el nervio motor de los músculos de la lengua.",
+"IX (glosofaríngeo): lleva el gusto del tercio posterior de la lengua, inerva la glándula parótida y el seno carotídeo; no controla las vísceras abdominales."
+]
+},
+{
+"q": "¿Qué glándula salival secreta saliva a través de un conducto que perfora el músculo buccinador y desemboca en el segundo molar superior?",
+"o": [
+"Parótida",
+"Submandibulares",
+"Sublinguales"
+],
+"c": 0,
+"fb": "La parótida: su conducto (de Stensen) perfora el buccinador y desemboca frente al segundo molar superior.",
+"por": []
+},
+{
+"q": "Esta glándula salival drena su contenido a través del conducto de Wharton, que desemboca en la papila sublingual:",
+"o": [
+"Parótida",
+"Submandibular",
+"Sublingual",
+"Glándula labial menor"
+],
+"c": 1,
+"fb": "La submandibular drena por el conducto de Wharton a un lado del frenillo lingual.",
+"por": []
+},
+{
+"q": "Forma parte del diente, se considera una parte esencial, porque ancla el diente a la pared alvéolo, lo fija con la región más subyacente del alveolo y actúa como amortiguador de golpes durante la masticación.",
+"o": [
+"Cemento",
+"Encia",
+"Ligamento periodontal",
+"Dentina"
+],
+"c": 2,
+"fb": "El ligamento periodontal fija el diente a la pared del alvéolo y actúa como amortiguador.",
+"por": []
+},
+{
+"q": "¿Qué afirmación es cierta acerca de la boca o cavidad bucal?",
+"o": [
+"La úvula durante la deglución desciende, lo que permite el paso de los alimentos a la cavidad nasal.",
+"Los huesos del paladar están conformados por el hueso lagrimal y el etmoides.",
+"El paladar es una pared o septo que separa la cavidad bucal de la nasal y forma el techo de la boca.",
+"El paladar duro es la porción posterior de la boca."
+],
+"c": 2,
+"fb": "El paladar es el septo entre boca y nariz. Al deglutir la úvula asciende (no desciende) para cerrar la nasofaringe, y el paladar duro es la porción anterior.",
+"por": []
+},
+{
+"q": "Los músculos constrictores de la faringe son:",
+"o": [
+"Estilofaríngeo, palatofaríngeo y salpingofaríngeo",
+"Constrictor superior, medio e inferior",
+"Tensor del velo del paladar y elevador del velo",
+"Genihioideo, milohioideo y digástrico"
+],
+"c": 1,
+"fb": "Los constrictores superior, medio e inferior impulsan el bolo alimenticio hacia el esófago durante la deglución.",
+"por": []
+},
+{
+"q": "¿Cuál de las siguientes es una función propia del sistema nervioso parasimpático?",
+"o": [
+"Midriasis pupilar",
+"Aumento de la frecuencia cardíaca",
+"Aumento del peristaltismo intestinal",
+"Vasoconstricción periférica"
+],
+"c": 2,
+"fb": "El parasimpático (vago y nervios sacros) estimula la motilidad y las secreciones digestivas. Las demás opciones son efectos simpáticos.",
+"por": []
+},
+{
+"q": "¿Cuál de las siguientes afirmaciones sobre los plexos entéricos es correcta?",
+"o": [
+"El plexo mientérico es conocido como plexo de meissner y se encuentra en la capa submucosa",
+"El plexo submucoso es conocido como el plexo meissner y se encuentra en la capa submucosa",
+"El plexo submucoso se encuentra en la capa muscular",
+"El plexo de auerbach se encuentra en la capa submucosa"
+],
+"c": 1,
+"fb": "El plexo submucoso (de Meissner) está en la submucosa. El mientérico (de Auerbach) está entre las capas musculares.",
+"por": []
+},
+{
+"q": "Cuando se presenta una alteración en la motilidad intestinal, ¿en cuál estructura del sistema nervioso entérico es más probable que se localice la lesión?",
+"o": [
+"Nervio vago",
+"Plexo de Auerbach",
+"Plexo de Meissner"
+],
+"c": 1,
+"fb": "El plexo mientérico (de Auerbach) controla la motilidad de la pared muscular del tubo digestivo.",
+"por": []
+},
+{
+"q": "El esófago atraviesa el diafragma a través del hiato esofágico, que se localiza a nivel de la vértebra:",
+"o": [
+"T8",
+"T10",
+"T12",
+"L1"
+],
+"c": 1,
+"fb": "El hiato esofágico está en T10. La vena cava inferior pasa en T8 y la aorta en T12.",
+"por": []
+},
+{
+"q": "¿Qué nombre recibe la zona de unión gastroesofágica que conecta el esófago con el fondo del estómago?",
+"o": [
+"antro pilórico",
+"cardias",
+"válvula esofágica superior",
+"esfínter gastrointestinal"
+],
+"c": 1,
+"fb": "El cardias es la región donde el esófago desemboca en el estómago.",
+"por": []
+},
+{
+"q": "Una mujer de 48 años con cirrosis hepática secundaria a hepatitis C presenta hematemesis. La endoscopia revela várices en la unión gastroesofágica. La sangre drena en este sitio a través de la anastomosis entre la vena gástrica izquierda y la vena:",
+"o": [
+"Ácigos",
+"Cava inferior directamente",
+"Esplénica",
+"Mesentérica superior"
+],
+"c": 0,
+"fb": "Con hipertensión portal, la vena gástrica izquierda (sistema porta) deriva sangre a las venas esofágicas y a la ácigos (sistema cava), formando várices.",
+"por": []
+},
+{
+"q": "Un paciente presenta várices esofágicos, ¿cuál de las siguientes estructuras será la principal causante?:",
+"o": [
+"mesentérica superior",
+"mesentérica inferior",
+"gástrica izquierda",
+"gástrica derecha"
+],
+"c": 2,
+"fb": "La vena gástrica izquierda se anastomosa con las venas esofágicas; por eso la hipertensión portal produce várices esofágicas.",
+"por": []
+},
+{
+"q": "¿Cuál es la curvatura del estómago irrigada principalmente por las arterias gástricas izquierda y derecha?",
+"o": [
+"Curvatura mayor",
+"Curvatura menor",
+"Fondo gástrico",
+"Píloro"
+],
+"c": 1,
+"fb": "La gástrica izquierda y la derecha se anastomosan a lo largo de la curvatura menor. La mayor la irrigan las gastroepiploicas.",
+"por": []
+},
+{
+"q": "Una paciente presenta dificultad severa para el vaciamiento gástrico debido a hipertrofia muscular localizada en la región distal del estómago. El problema anatómico afecta directamente el paso del quimo hacia el duodeno. ¿Qué estructura está afectada?",
+"o": [
+"Cardias",
+"Fondo gástrico",
+"Esfínter pilórico",
+"Curvatura mayor"
+],
+"c": 2,
+"fb": "El esfínter pilórico regula el vaciamiento gástrico hacia el duodeno.",
+"por": []
+},
+{
+"q": "Un hombre de 50 años presenta hematemesis masiva por una úlcera péptica situada en la cara posterior del bulbo duodenal. ¿Qué arteria es la que con mayor probabilidad fue erosionada por la úlcera?",
+"o": [
+"Gástrica izquierda",
+"Gastroduodenal",
+"Esplénica",
+"Hepática propia"
+],
+"c": 1,
+"fb": "La gastroduodenal pasa por detrás de la primera porción del duodeno y se erosiona en las úlceras posteriores.",
+"por": []
+},
+{
+"q": "El tronco celíaco emerge de la aorta abdominal aproximadamente a nivel de la vértebra:",
+"o": [
+"T10",
+"T12",
+"L1",
+"L3"
+],
+"c": 1,
+"fb": "El tronco celíaco nace en T12; la mesentérica superior en L1.",
+"por": []
+},
+{
+"q": "La arteria mesentérica inferior se origina de la aorta abdominal a nivel de la vértebra:",
+"o": [
+"L1",
+"L2",
+"L3",
+"L5"
+],
+"c": 2,
+"fb": "La mesentérica inferior nace en L3 e irriga colon descendente, sigmoide y recto superior.",
+"por": []
+},
+{
+"q": "Las tres ramas principales del tronco celíaco son:",
+"o": [
+"Gástrica izquierda, esplénica y hepática común",
+"Mesentérica superior, esplénica y gástrica derecha",
+"Hepática propia, mesentérica inferior y esplénica",
+"Gastroduodenal, gástrica derecha y esplénica"
+],
+"c": 0,
+"fb": "El tronco celíaco da la gástrica izquierda, la esplénica y la hepática común.",
+"por": []
+},
+{
+"q": "Paciente acude a consulta debido a un dolor intenso en el epigastrio, el órgano afectado se encuentra a nivel de L1 y L2, es retroperitoneal y se encuentra detrás del estómago. ¿Qué estructura es?",
+"o": [
+"estómago",
+"lóbulo hepático izquierdo",
+"lóbulo hepático derecho",
+"páncreas"
+],
+"c": 3,
+"fb": "El páncreas es retroperitoneal, queda detrás del estómago a nivel de L1-L2.",
+"por": []
+},
+{
+"q": "¿Cuál de las siguientes estructuras separa al duodeno del yeyuno?",
+"o": [
+"Píloro",
+"Ángulo de Treitz (ligamento suspensorio del duodeno)",
+"Válvula ileocecal",
+"Esfínter de Oddi"
+],
+"c": 1,
+"fb": "El ligamento suspensorio del duodeno (de Treitz) marca la unión duodenoyeyunal.",
+"por": []
+},
+{
+"q": "El conducto pancreático principal (de Wirsung) desemboca normalmente en:",
+"o": [
+"El estómago, a nivel del píloro",
+"La segunda porción del duodeno (ampolla de Vater)",
+"El yeyuno proximal",
+"El conducto cístico"
+],
+"c": 1,
+"fb": "Se une al colédoco y desemboca en la segunda porción (descendente) del duodeno, en la papila duodenal mayor.",
+"por": []
+},
+{
+"q": "¿Qué conducto pancreático se une con el conducto colédoco para formar la ampolla de Vater?",
+"o": [
+"Conducto de Santorini",
+"Conducto hepático común",
+"Conducto de Wirsung"
+],
+"c": 2,
+"fb": "El de Wirsung (principal) se une al colédoco y forma la ampolla hepatopancreática.",
+"por": []
+},
+{
+"q": "Parte del intestino delgado donde se encuentra mayor tejido linfoide conocido como las placas de Peyer.",
+"o": [
+"Duodeno",
+"Ilion",
+"Yeyuno"
+],
+"c": 1,
+"fb": "Las placas de Peyer predominan en el íleon.",
+"por": []
+},
+{
+"q": "¿Pliegue peritoneal con forma de abanico que une el yeyuno e íleon con la pared abdominal posterior?",
+"o": [
+"Mesocolon",
+"Ligamento redondo",
+"Mesenterio"
+],
+"c": 2,
+"fb": "El mesenterio sostiene yeyuno e íleon y conduce sus vasos.",
+"por": []
+},
+{
+"q": "Durante la fase intestinal de la digestión, la presencia de aminoácidos y ácidos grasos en el quimo duodenal estimula la liberación de Colecistoquinina (CCK). ¿Cuál de los siguientes es un efecto fisiológico específico de esta hormona?",
+"o": [
+"Estimulación de la secreción de un jugo pancreático rico en bicarbonato para neutralizar el ácido.",
+"Contracción del músculo liso de la vesícula biliar y relajación del esfínter de la ampolla hepatopancreática (de Vater).",
+"Aumento de la secreción de ácido clorhídrico por parte de las células parietales mediante la vía de la gastrina.",
+"Estimulación del complejo mioeléctrico migrante para iniciar la motilidad en ayunas."
+],
+"c": 1,
+"fb": "La CCK contrae la vesícula y relaja el esfínter de Oddi. El jugo rico en bicarbonato lo estimula la secretina.",
+"por": []
+},
+{
+"q": "En el intestino delgado, las células absortivas presentan microvellosidades que forman el \"borde en cepillo\". ¿Cuál de las siguientes enzimas se encuentra anclada específicamente en la membrana plasmática de estas microvellosidades y no es secretada al lumen?",
+"o": [
+"Amilasa pancreática.",
+"Elastasa.",
+"α-dextrinasa.",
+"Lipasa lingual."
+],
+"c": 2,
+"fb": "La α-dextrinasa es enzima del borde en cepillo. Las demás se secretan al lumen.",
+"por": []
+},
+{
+"q": "Un hombre de 67 años con fibrilación auricular presenta dolor abdominal súbito desproporcionado a los hallazgos físicos. La angiotomografía muestra trombo en el origen de la arteria mesentérica superior. ¿Qué porción del intestino se afectará primero?",
+"o": [
+"Colon transverso",
+"Yeyuno e íleon",
+"Colon descendente",
+"Duodeno"
+],
+"c": 1,
+"fb": "La AMS irriga yeyuno e íleon (además de colon ascendente y 2/3 proximales del transverso); el colon descendente depende de la mesentérica inferior.",
+"por": []
+},
+{
+"q": "La arteria mesentérica superior irriga las siguientes estructuras, EXCEPTO:",
+"o": [
+"Yeyuno e íleon",
+"Colon ascendente",
+"Dos tercios derechos del colon transverso",
+"Colon descendente y sigmoide"
+],
+"c": 3,
+"fb": "El colon descendente y el sigmoide los irriga la mesentérica inferior.",
+"por": []
+},
+{
+"q": "Un paciente presenta una oclusión en la arteria mesentérica superior. ¿Qué arteria se ve directamente afectada?",
+"o": [
+"pancreatoduodenal superior",
+"pancreatoduodenal inferior",
+"pancreática",
+"gastroduodenal"
+],
+"c": 1,
+"fb": "La pancreatoduodenal inferior nace de la AMS; la superior nace de la gastroduodenal (tronco celíaco).",
+"por": []
+},
+{
+"q": "Una mujer de 22 años presenta dolor periumbilical migratorio que se localiza, 6 horas después, en la fosa ilíaca derecha. Refiere fiebre, náusea y signo de McBurney positivo. ¿Cuál es la estructura más probablemente inflamada?",
+"o": [
+"Apéndice cecal",
+"Divertículo de Meckel",
+"Trompa uterina derecha",
+"Vesícula biliar"
+],
+"c": 0,
+"fb": "Es el cuadro clásico de apendicitis.",
+"por": []
+},
+{
+"q": "Señale la afirmación INCORRECTA respecto al colon:",
+"o": [
+"El colon ascendente y descendente son retroperitoneales",
+"El colon transverso y sigmoide poseen mesenterio",
+"Las tenias coli son tres bandas longitudinales de músculo liso",
+"El colon descendente está irrigado por la arteria mesentérica superior"
+],
+"c": 3,
+"fb": "El colon descendente lo irriga la mesentérica inferior.",
+"por": []
+},
+{
+"q": "El drenaje venoso del recto superior se dirige hacia el sistema:",
+"o": [
+"Cava inferior (sistémico)",
+"Porta, vía vena mesentérica inferior",
+"Ilíaco interno",
+"Pudendo interno"
+],
+"c": 1,
+"fb": "El recto superior drena a la mesentérica inferior y de ahí a la porta; recto medio e inferior drenan al sistema cava.",
+"por": []
+},
+{
+"q": "¿Cómo se le llama a la curvatura que hace el colon entre el colon ascendente y el colon transverso?",
+"o": [
+"Flexura cólica derecha",
+"Colon sigmoides",
+"Colón descendente",
+"Flexura cólica izquierda"
+],
+"c": 0,
+"fb": "La flexura cólica derecha (hepática) une el colon ascendente con el transverso.",
+"por": []
+},
+{
+"q": "El intestino grueso carece de vellosidades y pliegues circulares, pero presenta características estructurales únicas. ¿Cómo se denominan las bandas longitudinales de músculo liso engrosado que, al contraerse, forman las bolsas llamadas haustras?",
+"o": [
+"Apéndices epiplóicos.",
+"Pliegues semilunares.",
+"Tenias colónicas.",
+"Válvulas anales."
+],
+"c": 2,
+"fb": "Las tenias colónicas, al contraerse, forman las haustras.",
+"por": []
+},
+{
+"q": "¿Cuál de las siguientes estructuras es característica del intestino grueso y lo diferencia del intestino delgado?",
+"o": [
+"Microvellosidades",
+"Pliegues semilunares",
+"Pliegues circulares",
+"Vellosidades intestinales"
+],
+"c": 1,
+"fb": "Los pliegues semilunares son del colon. El intestino delgado tiene pliegues circulares, vellosidades y microvellosidades.",
+"por": []
+},
+{
+"q": "El hígado se divide funcionalmente en cuántos segmentos según la clasificación de Couinaud:",
+"o": [
+"4 segmentos",
+"6 segmentos",
+"8 segmentos",
+"10 segmentos"
+],
+"c": 2,
+"fb": "La clasificación de Couinaud define 8 segmentos hepáticos.",
+"por": []
+},
+{
+"q": "Esta estructura parte del peritoneo, ayuda a mantener unido el hígado con la pared anterior del abdomen y el diafragma, proporcionando al hígado que se fije y se suspenda en su posición anatómica.",
+"o": [
+"omento menor.",
+"mesenterio.",
+"omento mayor.",
+"Ligamento falciforme."
+],
+"c": 3,
+"fb": "El ligamento falciforme fija y suspende el hígado, y separa los lóbulos derecho e izquierdo.",
+"por": []
+},
+{
+"q": "Esta capa del peritoneo se origina como un pliegue anterior en la serosa del estómago y del duodeno, permitiendo que se conecte el estómago y el duodeno con el hígado. También cumple con la función de vía para que los vasos sanguíneos entren en el hígado.",
+"o": [
+"Omento menor",
+"Omento mayor",
+"Mesocolon",
+"Mesenterio"
+],
+"c": 0,
+"fb": "El omento menor (ligamento hepatogástrico y hepatoduodenal) une estómago y duodeno con el hígado.",
+"por": []
+},
+{
+"q": "¿Cuál de estas afirmaciones son ciertas de las arterias que pasan en el omento menor?",
+"o": [
+"Vena porta, arteria hepática.",
+"Arteria pancreática y gástrica corta",
+"Venas renales y arteria esplénica.",
+"Arteria gastroduodenal y Gástrica derecha."
+],
+"c": 3,
+"fb": "Reactivo ambiguo. Por el omento menor van la hepática propia y la gástrica derecha (más la porta y el colédoco); de las opciones, la d es la única formada solo por arterias.",
+"por": []
+},
+{
+"q": "¿Cuál de las siguientes estructuras conforma correctamente la triada portal del hígado?",
+"o": [
+"Conducto hepático común y arteria hepática",
+"Conducto biliar, conducto hepático común y vena hepática",
+"Conducto ciático, rama de la arteria hepática y vena hepática derecha",
+"Conducto biliar, rama de la arteria hepática y la rama de la vena hepática"
+],
+"c": 3,
+"fb": "La tríada portal: conducto biliar, rama de la arteria hepática y rama de la vena porta (la opción d dice «vena hepática», pero es la más cercana).",
+"por": []
+},
+{
+"q": "El hígado recibe sangre de dos fuentes, pero la mezcla de sangre oxigenada y desoxigenada ocurre en un punto específico antes de salir del órgano. ¿Cuál es la secuencia correcta del flujo sanguíneo a través del lobulillo hepático?",
+"o": [
+"Arteria hepática/Vena porta → Sinusoides → Vena central → Venas hepáticas.",
+"Vena central → Sinusoides → Tríada portal → Vena cava inferior.",
+"Vena porta → Conducto colédoco → Sinusoides → Vena central.",
+"Arteria hepática → Conductos biliares → Vena porta → Venas hepáticas."
+],
+"c": 0,
+"fb": "La sangre arterial y la portal se mezclan en los sinusoides, pasan a la vena central y salen por las venas hepáticas.",
+"por": []
+},
+{
+"q": "La sangre que pasa por la vena porta hepática, después de atravesar los sinusoides hepáticos, regresa al corazón a través de:",
+"o": [
+"Las venas hepáticas y la vena cava inferior",
+"La vena ácigos y la vena cava superior",
+"La vena esplénica y la vena renal izquierda",
+"La vena mesentérica inferior"
+],
+"c": 0,
+"fb": "Los sinusoides drenan a las venas hepáticas, que desembocan en la cava inferior.",
+"por": []
+},
+{
+"q": "Un paciente con cirrosis hepática avanzada presenta circulación venosa visible en la pared abdominal alrededor del ombligo (\"cabeza de Medusa\"). ¿Qué vena dilatada produce este signo?",
+"o": [
+"Vena paraumbilical",
+"Vena epigástrica inferior",
+"Vena cava inferior",
+"Vena esplénica"
+],
+"c": 0,
+"fb": "Con hipertensión portal, las venas paraumbilicales se dilatan y conectan con las venas de la pared abdominal.",
+"por": []
+},
+{
+"q": "Paciente masculino de 42 años de edad acude por dolor en hipocondrio derecho que describe como profundo y constante. Refiere que el dolor se irradia hacia el hombro derecho. En la exploración se encuentra hepatomegalia. ¿Qué estructura presenta irritación?",
+"o": [
+"Irritación del plexo lumbar",
+"Irritación del nervio vago",
+"Irritación del nervio frénico derecho",
+"Irritación del plexo pélvico"
+],
+"c": 2,
+"fb": "Es dolor referido: el frénico (C3-C5) inerva el diafragma y el peritoneo hepático, y comparte segmentos con la piel del hombro.",
+"por": []
+},
+{
+"q": "Una mujer de 50 años con sobrepeso presenta dolor cólico en el cuadrante superior derecho irradiado a la escápula derecha, 30 minutos después de comer alimentos grasos. El ultrasonido muestra cálculos en la vesícula. ¿Por dónde drena normalmente la bilis desde la vesícula hacia el duodeno?",
+"o": [
+"Conducto cístico → conducto colédoco → ampolla de Vater",
+"Conducto hepático común → conducto cístico → duodeno",
+"Conducto pancreático principal → ampolla de Vater",
+"Conducto cístico → conducto hepático derecho"
+],
+"c": 0,
+"fb": "La bilis sale por el cístico, pasa al colédoco y llega al duodeno por la ampolla de Vater.",
+"por": []
+},
+{
+"q": "Un paciente de 45 años se presenta con dolor intenso en el hipocondrio derecho que se irradia al hombro derecho, náuseas y esteatorrea (presencia de grasa en heces). Los estudios indican una obstrucción total del conducto colédoco por un lito (piedra) biliar. Basándote en la anatomía del sistema biliar y pancreático, ¿cuál de las siguientes consecuencias es fisiológicamente correcta para este caso?",
+"o": [
+"El paciente presentará niveles elevados de urobilinógeno en la orina debido a la hiperbilirrubinemia.",
+"La digestión de las proteínas se detendrá por completo debido a que el jugo pancreático no podrá llegar al duodeno bajo ninguna circunstancia.",
+"Se verá afectada la formación de micelas, impidiendo la absorción adecuada de vitaminas liposolubles (A, D, E, K).",
+"La bilis acumulada fluirá retrógradamente hacia el conducto cístico, aumentando la producción de bilis por los hepatocitos."
+],
+"c": 2,
+"fb": "Sin bilis no se forman micelas y falla la absorción de grasas y vitaminas liposolubles. Las proteínas aún se digieren porque el páncreas puede secretar por su conducto.",
+"por": []
+},
+{
+"q": "Cual no forma parte de la vesícula biliar",
+"o": [
+"fundus",
+"cuerpo",
+"cabeza",
+"cuello"
+],
+"c": 2,
+"fb": "La vesícula tiene fundus, cuerpo, infundíbulo y cuello; la cabeza pertenece al páncreas.",
+"por": []
+},
+{
+"q": "Señale la oración correcta respecto al páncreas:",
+"o": [
+"Es un órgano completamente intraperitoneal",
+"Su cabeza está rodeada por el marco duodenal y es retroperitoneal",
+"Su cola termina contra la cara posterior del estómago",
+"Su irrigación depende únicamente de la arteria gástrica izquierda"
+],
+"c": 1,
+"fb": "La cabeza del páncreas queda dentro de la curva del duodeno y es retroperitoneal. La cola llega al hilio del bazo.",
+"por": []
+},
+{
+"q": "Elige la oración que sea correcta respecto al páncreas",
+"o": [
+"El 99% son células exocrinas, llamados acinos y el 1% con células endocrinas llamadas islotes.",
+"Las células Beta son las que secretan glucagón, permitiendo hacer la gluconeogénesis",
+"La hormona del crecimiento humano (GH) y la adrenocorticotrofina (ACTH), no son capaces de estimular la secreción de insulina en el cuerpo.",
+"La somatostatina ayuda a la liberación de insulina y glucagón."
+],
+"c": 0,
+"fb": "Los acinos exocrinos forman la gran mayoría del páncreas y los islotes endocrinos el 1%. Las beta secretan insulina y la somatostatina inhibe insulina y glucagón.",
+"por": []
+},
+{
+"q": "¿Cuáles son los conductos del páncreas?",
+"o": [
+"conducto accesorio y de treitz",
+"conducto pancreático y hepático",
+"conducto de wirsung y accesorio",
+"conducto de vater y wirsung"
+],
+"c": 2,
+"fb": "El páncreas tiene el conducto de Wirsung (principal) y el accesorio (de Santorini).",
+"por": []
+},
+{
+"q": "Cual es la afirmación incorrecta acerca del páncreas",
+"o": [
+"es una glándula retroperitoneal de 2,5 cm de espesor",
+"conecta con el yeyuno por medio de dos conductos",
+"sus jugos pancreaticos son secretados por células exocrinas",
+"el conducto de wirsung se une al colédoco del hígado"
+],
+"c": 1,
+"fb": "Los conductos pancreáticos desembocan en el duodeno, no en el yeyuno.",
+"por": []
+},
+{
+"q": "Estas arterias son importantes ya que permiten distribuir las hormonas que va a secretar el páncreas a todo el sistema.",
+"o": [
+"Arteria hepática propia, arteria gástrica izquierda y gástrica derecha.",
+"Arteria ileocólica e ileales y arteria gástrica cortas",
+"Arteria pancreatoduodenal inferior, Arteria pancreática y gástrica corta",
+"Arteria Pancreatoduodenal inferior, Arteria Pancreática y Arteria gastroduodenal."
+],
+"c": 3,
+"fb": "Reactivo mal redactado. El páncreas recibe sangre de las pancreatoduodenales (de la gastroduodenal y la AMS) y de ramas pancreáticas de la esplénica; la d es la opción que reúne esa irrigación.",
+"por": []
+},
+{
+"q": "¿Qué plexo del sistema nervioso autónomo inerva el tubo digestivo?",
+"o": [
+"plexo sacro",
+"plexo pelviano",
+"plexo lumbar",
+"plexo braquial"
+],
+"c": 1,
+"fb": "Reactivo mal redactado, tal como viene en el examen. El tubo digestivo se inerva por los plexos entéricos (de Auerbach y de Meissner), que no aparecen en las opciones. De las opciones, la única autonómica es el plexo pelviano (hipogástrico inferior), que lleva fibras al colon distal y al recto; los plexos sacro, lumbar y braquial son somáticos.",
+"por": []
+},
+{
+"q": "¿Dónde se encuentra la papila duodenal mayor?",
+"o": [
+"9 cm debajo del ángulo de treitz",
+"4 cm debajo del esfínter esofágico",
+"4 cm debajo del esfínter pilórico",
+"en la parte media del duodeno"
+],
+"c": 3,
+"fb": "Reactivo mal redactado, tal como viene en el examen. La papila duodenal mayor está en la segunda porción (descendente) del duodeno, en su pared posteromedial, a unos 8-10 cm del píloro, es decir, en la parte media del duodeno. Ojo: si tu doctora marca la c («4 cm debajo del esfínter pilórico») en su clave, no coincide con la distancia que dan los textos clásicos.",
+"por": []
+}
+];
+const app = document.getElementById("app");
+const letras = ["a","b","c","d"];
+let i = 0, aciertos = 0;
+
+function mostrar() {
+  const p = preguntas[i];
+  app.innerHTML = `<div class="prog">Pregunta ${i+1} de ${preguntas.length}</div>
+    <p class="q">${p.q}</p>
+    <div id="opts">${p.o.map((t,k)=>`<button class="opt" data-k="${k}">${letras[k]}) ${t}</button>`).join("")}</div>
+    <div id="fb" hidden></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => responder(+b.dataset.k)));
+}
+
+function responder(k) {
+  const p = preguntas[i];
+  const bien = k === p.c;
+  if (bien) aciertos++;
+  app.querySelectorAll(".opt").forEach((b, n) => {
+    b.disabled = true;
+    if (n === p.c) b.classList.add("ok");
+    else if (n === k) b.classList.add("bad");
+  });
+  const fb = document.getElementById("fb");
+  fb.hidden = false;
+  fb.className = "fb";
+  fb.innerHTML = `<strong class="${bien?"ok":"bad"}">${bien?"Correcto.":"Incorrecto."}</strong>
+    ${bien ? "" : `La respuesta correcta es <strong>${letras[p.c]}) ${p.o[p.c]}</strong>.`}
+    <p>${p.fb}</p><ul>${p.por.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <button class="btn" id="sig">${i < preguntas.length-1 ? "Siguiente pregunta" : "Ver resultado"}</button>`;
+  document.getElementById("sig").addEventListener("click", () => {
+    i++;
+    i < preguntas.length ? mostrar() : final();
+  });
+  document.getElementById("sig").focus();
+}
+
+function final() {
+  app.innerHTML = `<div class="prog">Resultado</div>
+    <div class="score">${aciertos} / ${preguntas.length}</div>
+    <p>${aciertos === preguntas.length ? "Excelente, dominas estos temas." : "Repasa la retroalimentación de las preguntas que fallaste e inténtalo de nuevo."}</p>
+    <button class="btn" id="otra">Reintentar</button>`;
+  document.getElementById("otra").addEventListener("click", () => { i = 0; aciertos = 0; mostrar(); });
+}
+mostrar();
+</script>
+</body>
+</html>
