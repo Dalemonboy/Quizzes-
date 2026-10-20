@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Examen Biomol – Módulo 2 y Presentaciones P2</title>
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--tx:#1d2420;--mu:#5d6862;--ac:#2e7d32;--ok:#d9f2dc;--okb:#2e7d32;--no:#fde0dd;--nob:#c62828;--bd:#d8ddd8}
+@media(prefers-color-scheme:dark){:root{--bg:#161a17;--card:#202622;--tx:#e8ede9;--mu:#9aa69e;--ac:#66bb6a;--ok:#1f3a24;--okb:#66bb6a;--no:#422220;--nob:#ef5350;--bd:#35403a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif;padding:16px}
+.w{max-width:720px;margin:auto}h1{font-size:1.4rem;margin:0 0 4px}.mu{color:var(--mu);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin:14px 0}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:10px 14px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.opt{display:block;width:100%;text-align:left;margin:8px 0}.opt.ok{background:var(--ok);border-color:var(--okb)}.opt.no{background:var(--no);border-color:var(--nob)}
+.fb{margin-top:12px;padding:12px;border-radius:8px;background:var(--bg);border-left:4px solid var(--ac)}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--ok);color:var(--tx)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.hide{display:none}
+</style></head><body><div class="w">
+<h1>🧬 Examen Biomol</h1><div class="mu">Módulo 2 (regulación génica) + Presentaciones P2 (PCR y ADN recombinante) · 22 preguntas</div>
+<div id="home" class="card"><b>Elige el tema</b><div class="row" id="filters"></div><label class="mu"><input type="checkbox" id="shuf" checked> Mezclar preguntas y opciones</label><div class="row"><button class="p" onclick="start()">Comenzar</button></div></div>
+<div id="quiz" class="hide"><div class="bar"><i id="pb"></i></div><div class="mu" id="pt" style="margin-top:6px"></div>
+<div class="card"><span class="tag" id="tp"></span><h3 id="q" style="margin:10px 0"></h3><div id="os"></div><div id="fb" class="fb hide"></div><div class="row"><button class="p hide" id="nx" onclick="next()">Siguiente →</button></div></div></div>
+<div id="res" class="hide card"></div>
+</div>
+<script>
+const M="Módulo 2 · Regulación génica",P="P2 · PCR y ADN recombinante";
+const D=[
+[M,"Cambio epigenético que provoca el silenciamiento de la expresión de un gen:",["Metilación del ADN","Fosforilación de histonas","Acetilación de histonas"],0,"La metilación de citosinas (zonas CpG) en el ADN compacta la cromatina y silencia el gen. La acetilación de histonas hace lo contrario: relaja la cromatina y activa la expresión."],
+[M,"¿Qué función tiene una enzima reguladora positiva del splicing?",["Impide el splicing","Promueve el splicing"],1,"Un regulador positivo favorece o facilita el reconocimiento de los sitios de corte y la remoción de intrones; uno negativo lo inhibe."],
+[M,"Proteína del VIH que impide la atenuación de la transcripción:",["Rev","Tat"],1,"Tat evita la terminación prematura de la transcripción y favorece la elongación del RNA viral. Rev, en cambio, exporta del núcleo los RNA virales sin empalmar."],
+[M,"Es el proceso mediante el cual la información genética contenida en el ADN se utiliza para producir proteínas funcionales.",["Regulación de la expresión","Expresión génica","Mecanismos reguladores"],1,"Expresión génica = ADN → RNA → proteína. La regulación y los mecanismos reguladores son los que controlan cuándo y cuánto ocurre ese proceso."],
+[M,"¿Cuál de los siguientes NO es un objetivo de la regulación génica?",["Equilibrio","Adaptación","Eficiencia","Especialización"],0,"Según el material, la regulación génica busca adaptación al entorno, eficiencia (no gastar energía en lo innecesario) y especialización celular. «Equilibrio» no se maneja como objetivo."],
+[M,"Secuencias de ADN que se transcriben en el premRNA pero suelen ser eliminadas durante el splicing:",["miRNA","lncRNA","Exones","Intrones"],3,"Los intrones se transcriben pero se cortan en el splicing. Los exones son los que permanecen en el mRNA maduro."],
+[M,"Si un segmento CAA pasa por la edición del RNA y transforma la citosina, ¿qué impacto tendrá en la secuencia?",["No se puede saber con esta información","Genera un codón STOP","Es una mutación sinónima y no hay impacto"],1,"La edición C→U convierte CAA (glutamina) en UAA, un codón de paro: la proteína se trunca. Se cambió el significado del codón, por lo que no es sinónima."],
+[M,"Cuando la traducción empieza lejos del extremo Cap-5', se utiliza este mecanismo de control postraduccional:",["Cambio de estabilidad del mRNA","Control por ORFs","IRES"],2,"El IRES (sitio interno de entrada al ribosoma) permite iniciar la traducción sin depender del Cap-5', desde el interior del mRNA."],
+[M,"Mecanismo de control postranscripcional que se atribuye a la ambigüedad de intrones:",["Cambio en el sitio de hendidura del RNA transcrito","Atenuación de la transcripción","Splicing alternativo"],2,"Cuando una secuencia puede actuar como intron o exón, el splicing alternativo genera distintos mRNA (y proteínas) desde un mismo gen."],
+[M,"De los siguientes, ¿cuál es un ncRNA con función reguladora de la expresión?",["mRNA","miRNA","tRNA","rRNA"],1,"Los miRNA son RNA no codificantes pequeños que regulan la expresión al unirse a mRNA blanco (degradación o represión de la traducción). tRNA y rRNA son no codificantes pero con función estructural/traduccional, y el mRNA sí codifica."],
+[M,"Segmento del mRNA que contiene la información sobre a qué parte de la célula debe dirigirse:",["Poly-A-3'","UTR-5'","Cap-5'","UTR-3'"],3,"El UTR-3' contiene señales de localización (y de estabilidad) del mRNA. El Cap-5' y la cola poli-A protegen y ayudan en la traducción."],
+[M,"Enzima que, al fosforilarse, impide que dé inicio la traducción al bloquear el anclaje del complejo ribosomal:",["IRES","eIF4","ORF","eIF2"],3,"La fosforilación de eIF2 inhibe el inicio de la traducción global. IRES y ORF no son enzimas, y eIF4 participa en el reconocimiento del Cap."],
+[P,"¿Cuál es la función principal de los dNTPs en la PCR?",["Servir como bloques de construcción para nuevas cadenas de ADN","Funcionar como cofactores de la Taq Polimerasa","Delimitar el segmento a copiar de la cadena molde"],0,"Los dNTPs (dATP, dTTP, dCTP, dGTP) son los nucleótidos que la polimerasa une para sintetizar ADN. Delimitar el segmento es función de los primers."],
+[P,"¿Cuál es el organismo procariota más utilizado como sistema de expresión recombinante debido a su rápido crecimiento y genética caracterizada?",["E. coli","CHO","S. cerevisiae"],0,"E. coli es procariota, crece rápido y está muy bien caracterizada. CHO (células de mamífero) y S. cerevisiae (levadura) son eucariotas."],
+[P,"¿Qué es una molécula de ADN recombinante o quimérico?",["Una secuencia de ADN complementario","Una secuencia de ADN degradado por endonucleasas","Una secuencia conformada por ADN de origen distinto"],2,"Es ADN que combina fragmentos de orígenes diferentes (p. ej., un gen humano insertado en un plásmido bacteriano)."],
+[P,"¿Cuál es la función del marcador de selección (como el gen de resistencia a ampicilina, AmpR) en un vector plasmídico?",["Identificar el sitio de corte para las enzimas de restricción","Identificar las células que incorporaron el vector de expresión","Fomentar el plegamiento de la proteína derivada del gen de interés"],1,"Solo las bacterias que captaron el plásmido sobreviven en medio con ampicilina. El sitio de corte lo da el sitio de clonación múltiple (MCS)."],
+[P,"¿Cómo se define el valor de «Ct» o «Cq» en una PCR en tiempo real?",["La concentración inicial de nucleótidos expresada en picogramos","El ciclo donde la fluorescencia supera el umbral de detección","El tiempo total transcurrido desde el inicio del ensayo"],1,"Ct/Cq es el ciclo en que la fluorescencia cruza el umbral. A menor Ct, mayor cantidad inicial del blanco."],
+[P,"Si se requiere determinar únicamente la presencia o ausencia de una secuencia genómica en una muestra sin cuantificarla, ¿cuál de los siguientes métodos es el adecuado?",["NGS","PCR punto final + electroforesis","Microarreglos"],1,"La PCR de punto final con electroforesis responde sí/no (¿hay banda?) de forma sencilla y económica. NGS y microarreglos son más complejos."],
+[P,"Es una de las principales diferencias entre una PCR punto final y una PCR en tiempo real:",["La PCR punto final utiliza temperaturas más altas que la PCR tiempo real.","La qPCR permite medir la cantidad de ADN a medida que avanza el proceso, la punto final requiere terminar para ver resultados.","La qPCR no requiere primers/cebadores para iniciar el copiado, la PCR punto final sí."],1,"La qPCR monitorea la fluorescencia ciclo a ciclo y cuantifica; la punto final se analiza al terminar. Ambas usan primers y rangos de temperatura similares."],
+[P,"¿Qué tipo de muestra biológica se utiliza principalmente para la cuantificación de carga viral de VIH-1 mediante RT-qPCR?",["Plasma sanguíneo","Saliva","Esputo"],0,"El VIH-1 circula en sangre; se mide su RNA en plasma. La RT convierte el RNA viral a cDNA antes de la qPCR."],
+[P,"Etapa de un protocolo de PCR en el que se rompen los puentes de hidrógeno del ADN por efecto de la alta temperatura:",["Desnaturalización","Hibridación","Alineación","Elongación"],0,"A ~94-95 °C se separan las dos hebras (desnaturalización). Luego los primers se alinean (hibridación) y la polimerasa elonga."],
+[P,"¿Qué ensayo molecular se emplea para evaluar la replicación viral y monitorear la respuesta al tratamiento en pacientes con Hepatitis B?",["Clonación de genoma viral en vectores plasmídicos","Cuantificación de ADN de VHB mediante qPCR","Electroforesis en gel de agarosa por esputo"],1,"La carga viral de VHB (ADN) se cuantifica por qPCR y su descenso indica buena respuesta al tratamiento. El VHB se mide en sangre, no en esputo."]
+];
+const T=[M,P];let sel=new Set(T),qs=[],i=0,sc={},ans=false;
+const $=id=>document.getElementById(id);
+$("filters").innerHTML=T.map(t=>`<button class="p" data-t="${t}" onclick="tg(this)">${t}</button>`).join("");
+function tg(b){const t=b.dataset.t;if(sel.has(t)){sel.delete(t);b.classList.remove("p")}else{sel.add(t);b.classList.add("p")}}
+const sh=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[a[k],a[j]]=[a[j],a[k]]}return a};
+function start(){if(!sel.size)return;let b=D.filter(d=>sel.has(d[0]));if($("shuf").checked)b=sh(b);
+qs=b.map(d=>{let o=d[2].map((t,k)=>({t,c:k==d[3]}));if($("shuf").checked)o=sh(o);return{t:d[0],q:d[1],o,f:d[4]}});
+i=0;sc={};T.forEach(t=>sc[t]=[0,0]);$("home").classList.add("hide");$("res").classList.add("hide");$("quiz").classList.remove("hide");show()}
+function show(){const x=qs[i];ans=false;$("pt").textContent=`Pregunta ${i+1} de ${qs.length}`;$("pb").style.width=(i/qs.length*100)+"%";
+$("tp").textContent=x.t;$("q").textContent=x.q;$("fb").classList.add("hide");$("nx").classList.add("hide");
+$("os").innerHTML="";x.o.forEach((o,k)=>{const b=document.createElement("button");b.className="opt";b.textContent=o.t;b.onclick=()=>pick(k);$("os").appendChild(b)})}
+function pick(k){if(ans)return;ans=true;const x=qs[i],bs=$("os").children,r=x.o[k].c;sc[x.t][1]++;if(r)sc[x.t][0]++;
+x.o.forEach((o,j)=>{if(o.c)bs[j].classList.add("ok")});if(!r)bs[k].classList.add("no");
+$("fb").innerHTML=(r?"✅ <b>¡Correcto!</b> ":"❌ <b>Incorrecto.</b> ")+"<br>"+x.f;$("fb").classList.remove("hide");
+$("nx").textContent=i==qs.length-1?"Ver resultados":"Siguiente →";$("nx").classList.remove("hide")}
+function next(){i++;i<qs.length?show():fin()}
+function fin(){$("quiz").classList.add("hide");let a=0,n=0,h="";for(const t in sc){const[c,m]=sc[t];if(m){a+=c;n+=m;h+=`<p><b>${t}</b>: ${c}/${m} (${Math.round(c/m*100)}%)</p>`}}
+$("res").innerHTML=`<h2>Resultado: ${a}/${n} (${Math.round(a/n*100)}%)</h2>${h}<div class="row"><button class="p" onclick="start()">Reintentar</button><button onclick="home()">Cambiar tema</button></div>`;$("res").classList.remove("hide")}
+function home(){$("res").classList.add("hide");$("home").classList.remove("hide")}
+</script></body></html>
